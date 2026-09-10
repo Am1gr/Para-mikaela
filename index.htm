@@ -397,7 +397,7 @@
     </div>
 
     <script>
-        const MI_CORREO = "axl02877@gmail.com";
+                const MI_CORREO = "axl02877@gmail.com";
 
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
@@ -539,4 +539,33 @@
                                 });
                             } catch(e) {}
                         }
-  
+                        textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
+                    } else {
+                        responseCard.className = "response-card rejected";
+                        responseCard.innerHTML = "🕊️ <strong>Lo entiendo y lo respeto completamente, Mika.</strong> Tómate todo el tiempo que necesites sin ninguna presión. Siempre te voy a querer y aquí estaré si algún día quieres hablar.";
+                        textoRespuesta = "Mika ha indicado que necesita más tiempo / espacio 💔";
+                    }
+                }
+
+                // Envío de Notificación
+                const formData = new FormData();
+                formData.append('Respuesta', textoRespuesta);
+                formData.append('Fecha', new Date().toLocaleString('es-ES'));
+                formData.append('_subject', '¡Nueva respuesta de Mika en tu web!');
+                formData.append('_captcha', 'false');
+                formData.append('_template', 'table');
+
+                fetch(`https://formsubmit.co/ajax/${MI_CORREO}`, {
+                    method: "POST",
+                    headers: { 'Accept': 'application/json' },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => console.log("Enviado con éxito:", data))
+                .catch(err => console.error("Error al enviar email:", err));
+
+            } catch (err) {
+                console.error("Error en responder():", err);
+            }
+        };
+        
