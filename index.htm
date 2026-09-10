@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Para Mika 🤍</title>
 
+    <!-- Tipografías de Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+    <!-- Librería Confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -38,49 +40,6 @@
             overflow-x: hidden;
         }
 
-        /* Pantalla de inicio para permitir Audio en Celulares */
-        .start-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #1a0826;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            padding: 20px;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-
-        .start-overlay.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .start-btn {
-            background: linear-gradient(135deg, #ff4081 0%, #c2185b 100%);
-            color: #fff;
-            border: none;
-            padding: 16px 36px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(255, 64, 129, 0.5);
-            animation: pulseBtn 2s infinite;
-            margin-top: 20px;
-        }
-
-        @keyframes pulseBtn {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
         #ambient-canvas {
             position: fixed;
             top: 0;
@@ -91,7 +50,7 @@
             pointer-events: none;
         }
 
-        /* Control de Música y Barra de Volumen */
+        /* Control de Música Flotante */
         .music-control-wrapper {
             position: fixed;
             top: 20px;
@@ -390,22 +349,17 @@
 </head>
 <body>
 
-    <div class="start-overlay" id="startOverlay">
-        <div class="floating-heart-icon">💌</div>
-        <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 10px;">Para Mika</h2>
-        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 300px;">He preparado esto para ti. Toca el botón para abrir con música.</p>
-        <button class="start-btn" id="startBtn">Toca para abrir 💖</button>
-    </div>
-
+    <!-- Control de Música -->
     <div class="music-control-wrapper" id="musicWrapper">
         <button class="music-btn" id="musicToggleBtn" title="Control de Audio">🔊</button>
         <div class="volume-popout" id="volumePopout">
-            <button class="play-pause-btn" id="playPauseBtn" title="Pausar / Reproducir">⏸️</button>
+            <button class="play-pause-btn" id="playPauseBtn" title="Pausar / Reproducir">&#x23F8;&#xFE0F;</button>
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
             <span class="volume-percent" id="volumePercent">80%</span>
         </div>
     </div>
 
+    <!-- Reproductor de Audio (Loop activado) -->
     <audio id="bgMusic" loop playsinline preload="auto">
         <source src="2284.mp4" type="audio/mp4">
         <source src="2284.MP4" type="audio/mp4">
@@ -449,107 +403,142 @@
     </div>
 
     <script>
-        const MI_CORREO = "axl02877@gmail.com"; 
+        const MI_CORREO = "axl02877@gmail.com";
 
         const bgMusic = document.getElementById('bgMusic');
-        const startOverlay = document.getElementById('startOverlay');
-        const startBtn = document.getElementById('startBtn');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const volumePopout = document.getElementById('volumePopout');
         const volumeSlider = document.getElementById('volumeSlider');
         const volumePercent = document.getElementById('volumePercent');
         const playPauseBtn = document.getElementById('playPauseBtn');
 
-        let fadeInterval = null;
+        bgMusic.volume = 0.8;
 
-        // Función segura para ajustar volumen (Evita errores en iOS donde volume es solo lectura)
-        function setAudioVolume(val) {
-            try {
-                bgMusic.volume = Math.max(0, Math.min(1, val));
-            } catch (e) {
-                console.log("Ajuste de volumen no soportado en este dispositivo:", e);
-            }
-        }
-
-        // Entrada Suave de Música (Fade In)
-        function fadeInAudio(targetVolume = parseFloat(volumeSlider.value), duration = 2500) {
-            if (fadeInterval) clearInterval(fadeInterval);
-            setAudioVolume(0);
-            
-            const playPromise = bgMusic.play();
-            if (playPromise !== undefined) {
-                playPromise.then(() => {
-                    playPauseBtn.textContent = "⏸️";
-                    let currentStep = 0;
-                    const steps = 30;
-                    const intervalTime = duration / steps;
-                    const volumeStep = targetVolume / steps;
-
-                    fadeInterval = setInterval(() => {
-                        currentStep++;
-                        let nextVol = volumeStep * currentStep;
-                        if (nextVol >= targetVolume) {
-                            setAudioVolume(targetVolume);
-                            clearInterval(fadeInterval);
-                            fadeInterval = null;
-                        } else {
-                            setAudioVolume(nextVol);
-                        }
-                        actualizarIconoBoton();
-                    }, intervalTime);
-                }).catch(err => {
-                    console.log("Error al reproducir audio:", err);
+        // Función para reproducir música con seguridad
+        function intentarReproducir() {
+            if (bgMusic.paused) {
+                bgMusic.play().then(() => {
+                    playPauseBtn.textContent = "\u23F8\uFE0F";
+                    musicToggleBtn.textContent = "\uD83D\uDD0A";
+                }).catch(() => {
+                    // Si el navegador bloquea el autoplay inicial, sonará con el primer toque
                 });
             }
         }
 
-        // Desaparición Suave de Música (Fade Out)
-        function fadeOutAudio(duration = 2000, onComplete = null) {
-            if (fadeInterval) clearInterval(fadeInterval);
-            let startVol = 0.8;
-            try { startVol = bgMusic.volume; } catch(e) {}
+        // Intenta reproducir de inmediato al cargar la página
+        window.addEventListener('load', intentarReproducir);
 
-            if (startVol <= 0 || bgMusic.paused) {
-                bgMusic.pause();
-                playPauseBtn.textContent = "▶️";
-                musicToggleBtn.textContent = "🔇";
-                if (onComplete) onComplete();
-                return;
-            }
+        // Si el navegador exigió interacción, sonará al tocar cualquier parte de la pantalla por primera vez
+        document.addEventListener('click', intentarReproducir, { once: true });
+        document.addEventListener('touchstart', intentarReproducir, { once: true });
 
-            let currentStep = 0;
-            const steps = 30;
-            const intervalTime = duration / steps;
-
-            fadeInterval = setInterval(() => {
-                currentStep++;
-                let nextVol = startVol - (startVol * (currentStep / steps));
-                if (nextVol <= 0) {
-                    setAudioVolume(0);
-                    bgMusic.pause();
-                    playPauseBtn.textContent = "▶️";
-                    musicToggleBtn.textContent = "🔇";
-                    clearInterval(fadeInterval);
-                    fadeInterval = null;
-                    if (onComplete) onComplete();
-                } else {
-                    setAudioVolume(nextVol);
-                    actualizarIconoBoton();
-                }
-            }, intervalTime);
-        }
-
-        // Iniciar con el botón de la pantalla overlay
-        startBtn.addEventListener('click', () => {
-            startOverlay.classList.add('hidden');
-            fadeInAudio(parseFloat(volumeSlider.value), 2500);
-        });
-
-        // Toggle Menú Volumen
+        // Toggle del Menú Flotante de Volumen
         musicToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             volumePopout.classList.toggle('show');
         });
 
         document.addEventListener('click', (e) => {
-            if (!e.target.c
+            if (!e.target.closest('#musicWrapper')) {
+                volumePopout.classList.remove('show');
+            }
+        });
+
+        // Control Manual del Slider de Volumen
+        volumeSlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            bgMusic.volume = val;
+            volumePercent.textContent = Math.round(val * 100) + '%';
+            if (val === 0 || bgMusic.paused) {
+                musicToggleBtn.textContent = "\uD83D\uDD07";
+            } else if (val < 0.5) {
+                musicToggleBtn.textContent = "\uD83D\uDD09";
+            } else {
+                musicToggleBtn.textContent = "\uD83D\uDD0A";
+            }
+        });
+
+        // Botón Play / Pausa
+        playPauseBtn.addEventListener('click', () => {
+            if (bgMusic.paused) {
+                bgMusic.play();
+                playPauseBtn.textContent = "\u23F8\uFE0F";
+                musicToggleBtn.textContent = "\uD83D\uDD0A";
+            } else {
+                bgMusic.pause();
+                playPauseBtn.textContent = "\u25B6\uFE0F";
+                musicToggleBtn.textContent = "\uD83D\uDD07";
+            }
+        });
+
+        /* Fondo Animado de Corazones y Flores */
+        const canvas = document.getElementById('ambient-canvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Element {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * width;
+                this.y = -20;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.2 + 0.5;
+                this.speedX = Math.random() * 0.8 - 0.4;
+                this.opacity = Math.random() * 0.6 + 0.3;
+                this.type = Math.random() > 0.4 ? '❤️' : '🌸';
+            }
+            update() {
+                this.y += this.speedY;
+                this.x += Math.sin(this.y * 0.01) + this.speedX;
+                if (this.y > height + 20) this.reset();
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.font = `${this.size}px serif`;
+                ctx.fillText(this.type, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        const elements = Array.from({ length: 30 }, () => new Element());
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+            elements.forEach(e => { e.update(); e.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        /* Manejo de Respuesta y Envío Garantizado de Email */
+        function responder(tipo) {
+            intentarReproducir();
+            const responseCard = document.getElementById('responseCard');
+            const actionButtons = document.getElementById('actionButtons');
+
+            actionButtons.style.display = 'none';
+            responseCard.style.display = 'block';
+
+            let textoRespuesta = "";
+
+            if (tipo === 'ACEPTADO') {
+                responseCard.className = "response-card success";
+                responseCard.innerHTML = "🤍 <strong>Gracias de todo corazón, Mika.</strong> Significa el mundo para mí. Prometo darte la atención que te mereces, ir a tu ritmo y cuidar cada detalle.";
+                
+                confetti({
+                    particleCount: 160,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4081', '#f8bbd0', '#ffffff', '#e0a96d']
+                });
+                textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
+            } else {
+                responseCard.className = "response-card rejected";
+                responseCard.innerHTML = "🕊️ <strong>Lo entiendo y lo respeto completamente, Mika.</strong> Tómate todo el tiempo que 
