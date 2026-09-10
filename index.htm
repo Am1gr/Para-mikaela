@@ -351,9 +351,9 @@
 
     <!-- Control de Música -->
     <div class="music-control-wrapper" id="musicWrapper">
-        <button class="music-btn" id="musicToggleBtn" title="Control de Audio">🔊</button>
+        <button class="music-btn" id="musicToggleBtn" type="button" title="Control de Audio">🔊</button>
         <div class="volume-popout" id="volumePopout">
-            <button class="play-pause-btn" id="playPauseBtn" title="Pausar / Reproducir">&#x23F8;&#xFE0F;</button>
+            <button class="play-pause-btn" id="playPauseBtn" type="button" title="Pausar / Reproducir">&#x23F8;&#xFE0F;</button>
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
             <span class="volume-percent" id="volumePercent">80%</span>
         </div>
@@ -388,10 +388,10 @@
             </div>
 
             <div class="actions" id="actionButtons">
-                <button class="btn-apology" onclick="responder('ACEPTADO')">
+                <button class="btn-apology" type="button" onclick="responder('ACEPTADO')">
                     <span>Acepto tus disculpas 💖</span>
                 </button>
-                <button class="btn-reject" id="rejectBtn" onclick="responder('RECHAZADO')">
+                <button class="btn-reject" id="rejectBtn" type="button" onclick="responder('RECHAZADO')">
                     Todavía necesito mi tiempo 💔
                 </button>
             </div>
@@ -412,67 +412,66 @@
         const volumePercent = document.getElementById('volumePercent');
         const playPauseBtn = document.getElementById('playPauseBtn');
 
-        bgMusic.volume = 0.8;
+        if (bgMusic) bgMusic.volume = 0.8;
 
-        // Función para reproducir música con seguridad
         function intentarReproducir() {
-            if (bgMusic.paused) {
+            if (bgMusic && bgMusic.paused) {
                 bgMusic.play().then(() => {
-                    playPauseBtn.textContent = "\u23F8\uFE0F";
-                    musicToggleBtn.textContent = "\uD83D\uDD0A";
-                }).catch(() => {
-                    // Si el navegador bloquea el autoplay inicial, sonará con el primer toque
-                });
+                    if (playPauseBtn) playPauseBtn.textContent = "\u23F8\uFE0F";
+                    if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD0A";
+                }).catch(() => {});
             }
         }
 
-        // Intenta reproducir de inmediato al cargar la página
         window.addEventListener('load', intentarReproducir);
-
-        // Si el navegador exigió interacción, sonará al tocar cualquier parte de la pantalla por primera vez
         document.addEventListener('click', intentarReproducir, { once: true });
         document.addEventListener('touchstart', intentarReproducir, { once: true });
 
-        // Toggle del Menú Flotante de Volumen
-        musicToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            volumePopout.classList.toggle('show');
-        });
+        if (musicToggleBtn) {
+            musicToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (volumePopout) volumePopout.classList.toggle('show');
+            });
+        }
 
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#musicWrapper')) {
+            if (!e.target.closest('#musicWrapper') && volumePopout) {
                 volumePopout.classList.remove('show');
             }
         });
 
-        // Control Manual del Slider de Volumen
-        volumeSlider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            bgMusic.volume = val;
-            volumePercent.textContent = Math.round(val * 100) + '%';
-            if (val === 0 || bgMusic.paused) {
-                musicToggleBtn.textContent = "\uD83D\uDD07";
-            } else if (val < 0.5) {
-                musicToggleBtn.textContent = "\uD83D\uDD09";
-            } else {
-                musicToggleBtn.textContent = "\uD83D\uDD0A";
-            }
-        });
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value);
+                if (bgMusic) bgMusic.volume = val;
+                if (volumePercent) volumePercent.textContent = Math.round(val * 100) + '%';
+                if (val === 0 || (bgMusic && bgMusic.paused)) {
+                    if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD07";
+                } else if (val < 0.5) {
+                    if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD09";
+                } else {
+                    if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD0A";
+                }
+            });
+        }
 
-        // Botón Play / Pausa
-        playPauseBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                bgMusic.play();
-                playPauseBtn.textContent = "\u23F8\uFE0F";
-                musicToggleBtn.textContent = "\uD83D\uDD0A";
-            } else {
-                bgMusic.pause();
-                playPauseBtn.textContent = "\u25B6\uFE0F";
-                musicToggleBtn.textContent = "\uD83D\uDD07";
-            }
-        });
+        if (playPauseBtn) {
+            playPauseBtn.addEventListener('click', () => {
+                if (bgMusic) {
+                    if (bgMusic.paused) {
+                        bgMusic.play();
+                        playPauseBtn.textContent = "\u23F8\uFE0F";
+                        if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD0A";
+                    } else {
+                        bgMusic.pause();
+                        playPauseBtn.textContent = "\u25B6\uFE0F";
+                        if (musicToggleBtn) musicToggleBtn.textContent = "\uD83D\uDD07";
+                    }
+                }
+            });
+        }
 
-        /* Fondo Animado de Corazones y Flores */
+        /* Fondo Animado */
         const canvas = document.getElementById('ambient-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -508,7 +507,7 @@
             }
         }
 
-        const elements = Array.from({ length: 30 }, () => new Element());
+        const elements = Array.from({ length: 28 }, () => new Element());
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
@@ -517,28 +516,28 @@
         }
         animate();
 
-        /* Manejo de Respuesta y Envío Garantizado de Email */
-        function responder(tipo) {
-            intentarReproducir();
-            const responseCard = document.getElementById('responseCard');
-            const actionButtons = document.getElementById('actionButtons');
+        /* Función Responder protegida contra errores */
+        window.responder = function(tipo) {
+            try {
+                intentarReproducir();
 
-            actionButtons.style.display = 'none';
-            responseCard.style.display = 'block';
+                const responseCard = document.getElementById('responseCard');
+                const actionButtons = document.getElementById('actionButtons');
 
-            let textoRespuesta = "";
+                if (actionButtons) actionButtons.style.display = 'none';
 
-            if (tipo === 'ACEPTADO') {
-                responseCard.className = "response-card success";
-                responseCard.innerHTML = "🤍 <strong>Gracias de todo corazón, Mika.</strong> Significa el mundo para mí. Prometo darte la atención que te mereces, ir a tu ritmo y cuidar cada detalle.";
-                
-                confetti({
-                    particleCount: 160,
-                    spread: 100,
-                    origin: { y: 0.6 },
-                    colors: ['#ff4081', '#f8bbd0', '#ffffff', '#e0a96d']
-                });
-                textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
-            } else {
-                responseCard.className = "response-card rejected";
-                responseCard.innerHTML = "🕊️ <strong>Lo entiendo y lo respeto completamente, Mika.</strong> Tómate todo el tiempo que 
+                let textoRespuesta = "";
+
+                if (responseCard) {
+                    responseCard.style.display = 'block';
+
+                    if (tipo === 'ACEPTADO') {
+                        responseCard.className = "response-card success";
+                        responseCard.innerHTML = "🤍 <strong>Gracias de todo corazón, Mika.</strong> Significa el mundo para mí. Prometo darte la atención que te mereces, ir a tu ritmo y cuidar cada detalle.";
+                        
+                        if (typeof confetti === 'function') {
+                            try {
+                                confetti({
+                                    particleCount: 160,
+                                    spread: 100,
+                           
