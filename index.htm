@@ -5,21 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Para Mika 🤍</title>
 
-    <!-- Fuentes de Google: Cormorant Garamond y Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- Librería de Confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         :root {
-            --primary: #d81b60;
+            --primary: #ff4081;
             --primary-light: #f8bbd0;
             --rose-gold: #e0a96d;
-            --bg-gradient: linear-gradient(135deg, #1a0b16 0%, #2a1226 50%, #150919 100%);
-            --card-bg: rgba(255, 255, 255, 0.07);
+            --bg-gradient: linear-gradient(135deg, #2b091e 0%, #1a0826 50%, #0d0414 100%);
+            --card-bg: rgba(255, 255, 255, 0.08);
             --text-main: #fcf8f9;
             --text-muted: #e1d5e0;
         }
@@ -33,22 +31,20 @@
 
         html, body {
             width: 100%;
-            height: 100%;
-            overflow-x: hidden;
+            min-height: 100vh;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: var(--bg-gradient);
             color: var(--text-main);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            overflow-x: hidden;
         }
 
+        /* Canvas de corazones adaptables a cualquier resolución */
         #ambient-canvas {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             z-index: 1;
             pointer-events: none;
         }
@@ -57,25 +53,28 @@
             position: relative;
             z-index: 2;
             width: 100%;
-            min-height: 100dvh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: clamp(1rem, 4vw, 2.5rem);
+            padding: clamp(1rem, 5vw, 3rem);
         }
 
+        /* Tarjeta Responsiva (Ajuste automático para Celular y PC) */
         .card {
             position: relative;
-            width: min(100%, 560px);
+            width: min(100%, 600px);
             background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: clamp(1.8rem, 5vw, 3.2rem);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: clamp(20px, 4vw, 36px);
+            padding: clamp(1.5rem, 5vw, 3.5rem);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 182, 193, 0.25);
             animation: cardAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             overflow: hidden;
+            text-align: center;
+            margin: auto;
         }
 
         .card::before {
@@ -85,7 +84,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 20%, rgba(216, 27, 96, 0.15) 0%, transparent 50%);
+            background: radial-gradient(circle at 50% 20%, rgba(255, 64, 129, 0.22) 0%, transparent 60%);
             pointer-events: none;
         }
 
@@ -94,91 +93,102 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        .floating-heart-icon {
+            font-size: clamp(2.3rem, 5vw, 3.2rem);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            animation: pulseHeart 1.8s infinite ease-in-out;
+        }
+
+        @keyframes pulseHeart {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(255,64,129,0.5)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 20px rgba(255,64,129,0.9)); }
+        }
+
         .header-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(216, 27, 96, 0.15);
-            border: 1px solid rgba(216, 27, 96, 0.3);
-            padding: 6px 16px;
+            background: rgba(255, 64, 129, 0.2);
+            border: 1px solid rgba(255, 64, 129, 0.4);
+            padding: 6px 20px;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 2vw, 0.88rem);
             color: #ff80ab;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
             font-weight: 600;
             margin-bottom: 1.2rem;
         }
 
-        .header-badge svg {
-            width: 14px;
-            height: 14px;
-            fill: currentColor;
-        }
-
         h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(2.2rem, 6vw, 3.2rem);
+            font-size: clamp(2.2rem, 6vw, 3.5rem);
             font-weight: 700;
             line-height: 1.15;
-            background: linear-gradient(135deg, #ffffff 0%, #f8bbd0 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #ff80ab 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.6rem;
         }
 
         .sub-title {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(0.9rem, 2.5vw, 1.15rem);
             font-weight: 300;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
 
         .divider {
             height: 1px;
             width: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            margin-bottom: 2rem;
+            background: linear-gradient(90deg, transparent, rgba(255, 128, 171, 0.4), transparent);
+            margin-bottom: 1.8rem;
         }
 
         .message-body {
             color: var(--text-muted);
-            font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+            font-size: clamp(0.95rem, 2.2vw, 1.1rem);
             line-height: 1.8;
             font-weight: 300;
             text-align: left;
             margin-bottom: 2.2rem;
+            background: rgba(0, 0, 0, 0.25);
+            padding: clamp(1rem, 3.5vw, 1.6rem);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .message-body p { margin-bottom: 1.2rem; }
+        .message-body p { margin-bottom: 1rem; }
         .message-body p:last-child { margin-bottom: 0; }
 
         .highlight {
             color: #ffffff;
-            font-weight: 500;
-            border-bottom: 1px dotted rgba(255, 128, 171, 0.5);
+            font-weight: 600;
+            border-bottom: 1px dotted #ff80ab;
         }
 
+        /* Botones de acción (Adaptados a táctil y ratón de PC) */
         .actions {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             align-items: center;
+            width: 100%;
         }
 
         .btn-apology {
             width: 100%;
-            max-width: 340px;
-            padding: 16px 28px;
-            background: linear-gradient(135deg, #e91e63 0%, #ad1457 100%);
+            padding: clamp(14px, 3vw, 18px) clamp(20px, 4vw, 32px);
+            background: linear-gradient(135deg, #ff4081 0%, #c2185b 100%);
             color: #ffffff;
             border: none;
             border-radius: 50px;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 1rem;
+            font-size: clamp(0.95rem, 2.5vw, 1.05rem);
             font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(233, 30, 99, 0.35);
+            box-shadow: 0 10px 25px rgba(255, 64, 129, 0.4);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             justify-content: center;
@@ -187,28 +197,62 @@
             outline: none;
         }
 
-        .btn-apology:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(233, 30, 99, 0.5);
+        /* Interacción optimizada para PC */
+        @media (hover: hover) {
+            .btn-apology:hover {
+                transform: translateY(-3px) scale(1.02);
+                box-shadow: 0 15px 35px rgba(255, 64, 129, 0.65);
+            }
+            .btn-reject:hover {
+                background: rgba(255, 255, 255, 0.15);
+                color: #ffffff;
+                border-color: rgba(255, 255, 255, 0.3);
+            }
         }
 
-        .btn-apology:active { transform: translateY(1px) scale(0.98); }
+        .btn-apology:active, .btn-reject:active {
+            transform: scale(0.98);
+        }
+
+        .btn-reject {
+            width: 100%;
+            padding: clamp(10px, 2.5vw, 14px) clamp(18px, 3.5vw, 28px);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
 
         .response-card {
             display: none;
             margin-top: 1.5rem;
-            padding: 1.2rem 1.5rem;
-            background: rgba(46, 125, 50, 0.15);
-            border: 1px solid rgba(129, 199, 132, 0.4);
-            border-radius: 16px;
-            color: #a5d6a7;
-            font-size: 0.95rem;
+            padding: 1.4rem 1.6rem;
+            border-radius: 20px;
+            font-size: clamp(0.9rem, 2.2vw, 1.02rem);
             line-height: 1.6;
             animation: fadeIn 0.6s ease forwards;
         }
 
+        .response-card.success {
+            background: rgba(46, 125, 50, 0.25);
+            border: 1px solid rgba(129, 199, 132, 0.45);
+            color: #a5d6a7;
+        }
+
+        .response-card.rejected {
+            background: rgba(198, 40, 40, 0.25);
+            border: 1px solid rgba(239, 154, 154, 0.45);
+            color: #ef9a9a;
+        }
+
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -216,25 +260,28 @@
             margin-top: 2rem;
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 0.5px;
         }
 
-        @media (max-width: 480px) {
-            .card { padding: 1.6rem 1.2rem; border-radius: 22px; }
-            .header-badge { font-size: 0.75rem; padding: 4px 12px; }
+        /* Pantallas muy pequeñas o teléfonos compactos */
+        @media (max-width: 420px) {
+            .wrapper { padding: 0.8rem; }
+            .card { padding: 1.5rem 1.1rem; border-radius: 22px; }
+            .message-body { padding: 1rem; }
         }
     </style>
 </head>
 <body>
 
+    <audio id="bgMusic" loop src="2284.mp4"></audio>
+
     <canvas id="ambient-canvas"></canvas>
 
     <div class="wrapper">
         <div class="card">
-            <div class="header-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                Mensaje sincero
-            </div>
+            
+            <div class="floating-heart-icon">💖</div>
+
+            <div class="header-badge">Mensaje para ti</div>
 
             <h1>Mika, perdón de corazón</h1>
             <p class="sub-title">Para ti, porque te mereces toda mi sinceridad...</p>
@@ -244,25 +291,79 @@
             <div class="message-body">
                 <p>Hola <span class="highlight">Mika</span>,</p>
                 <p>Escribo esto porque no quería dejar pasar un momento más sin decirte sinceramente cuánto <span class="highlight">lamento haberte hecho daño</span>. Saber que mis acciones o palabras te causaron pesar me duele profundamente.</p>
-                <p>Jamás fue mi intención lastimarte, pero entiendo perfectamente que eso no borra lo sucedido. Tu tranquilidad y tus sentimientos me importan demasiado, y me duele haber fallado en cuidarlos como debía.</p>
-                <p>Valoro infinitamente quién eres y lo que significas para mí. No espero que todo cambie al instante, pero quiero que sepas que estoy dispuesto/a a aprender de esto y dar lo mejor de mí para remediarlo.</p>
+                <p>Jamás fue mi intención lastimarte. Tu tranquilidad y tus sentimientos me importan muchísimo, y me duele haber fallado en cuidarlos como debía.</p>
+                <p>Valoro infinitamente quién eres y lo que significas para mí. Prometo dar lo mejor de mí para remediarlo.</p>
             </div>
 
-            <div class="actions">
-                <button class="btn-apology" id="apologyBtn" onclick="aceptarDisculpas()">
-                    <span>Acepto tus disculpas, hablemos</span> ✨
+            <div class="actions" id="actionButtons">
+                <button class="btn-apology" onclick="responder('ACEPTADO')">
+                    <span>Acepto tus disculpas 💖</span>
+                </button>
+                <button class="btn-reject" id="rejectBtn" onclick="responder('RECHAZADO')">
+                    Aún necesito tiempo / No acepto 💔
                 </button>
             </div>
 
-            <div id="responseCard" class="response-card">
-                🤍 <strong>Gracias infinitas, Mika.</strong> Significa el mundo para mí que leas esto. Prometo cuidar mucho más de ti y de nuestra relación de aquí en adelante.
-            </div>
+            <div id="responseCard" class="response-card"></div>
 
-            <div class="footer-note">Hecho con respeto y cariño especialmente para Mika</div>
+            <div class="footer-note">Hecho especialmente para Mika 🌸</div>
         </div>
     </div>
 
     <script>
+        /* Correo para recibir las notificaciones */
+        const MI_CORREO = "axl02877@gmail.com"; 
+
+        /* Sistema de Audio con Fade-In (Aparición) y Fade-Out (Desvanecimiento) */
+        const bgMusic = document.getElementById('bgMusic');
+        let musicStarted = false;
+        let fadeInterval = null;
+
+        // Aparición Suave (Fade-In)
+        function fadeInAudio(duration = 3500, maxVolume = 0.6) {
+            if (fadeInterval) clearInterval(fadeInterval);
+            bgMusic.volume = 0;
+            bgMusic.play().then(() => {
+                musicStarted = true;
+                const step = maxVolume / (duration / 50);
+                fadeInterval = setInterval(() => {
+                    if (bgMusic.volume + step < maxVolume) {
+                        bgMusic.volume += step;
+                    } else {
+                        bgMusic.volume = maxVolume;
+                        clearInterval(fadeInterval);
+                    }
+                }, 50);
+            }).catch(() => {});
+        }
+
+        // Desvanecimiento Suave (Fade-Out)
+        function fadeOutAudio(duration = 2500, callback) {
+            if (fadeInterval) clearInterval(fadeInterval);
+            const step = bgMusic.volume / (duration / 50);
+            fadeInterval = setInterval(() => {
+                if (bgMusic.volume - step > 0) {
+                    bgMusic.volume -= step;
+                } else {
+                    bgMusic.volume = 0;
+                    bgMusic.pause();
+                    clearInterval(fadeInterval);
+                    if (callback) callback();
+                }
+            }, 50);
+        }
+
+        // Iniciar audio al interactuar por primera vez con la pantalla
+        function initAudioOnTouch() {
+            if (!musicStarted) {
+                fadeInAudio(3500, 0.6);
+            }
+        }
+
+        document.body.addEventListener('click', initAudioOnTouch, { once: true });
+        document.body.addEventListener('touchstart', initAudioOnTouch, { once: true });
+
+        /* Fondo animado responsivo de Corazones y Flores */
         const canvas = document.getElementById('ambient-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -273,58 +374,82 @@
             height = canvas.height = window.innerHeight;
         });
 
-        class Petal {
+        class Element {
             constructor() { this.reset(); }
             reset() {
                 this.x = Math.random() * width;
                 this.y = -20;
-                this.size = Math.random() * 8 + 6;
-                this.speedY = Math.random() * 1.2 + 0.6;
+                this.size = Math.random() * 12 + 8;
+                this.speedY = Math.random() * 1.2 + 0.5;
                 this.speedX = Math.random() * 0.8 - 0.4;
-                this.opacity = Math.random() * 0.5 + 0.3;
-                this.rotation = Math.random() * 360;
-                this.spin = Math.random() * 2 - 1;
-                this.color = ['#f8bbd0', '#ff80ab', '#ea80fc', '#ffffff'][Math.floor(Math.random() * 4)];
+                this.opacity = Math.random() * 0.6 + 0.3;
+                this.type = Math.random() > 0.4 ? '❤️' : '🌸';
             }
             update() {
                 this.y += this.speedY;
                 this.x += Math.sin(this.y * 0.01) + this.speedX;
-                this.rotation += this.spin;
                 if (this.y > height + 20) this.reset();
             }
             draw() {
                 ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate((this.rotation * Math.PI) / 180);
                 ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.font = `${this.size}px serif`;
+                ctx.fillText(this.type, this.x, this.y);
                 ctx.restore();
             }
         }
 
-        const petals = Array.from({ length: 35 }, () => new Petal());
+        const elements = Array.from({ length: 30 }, () => new Element());
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            petals.forEach(p => { p.update(); p.draw(); });
+            elements.forEach(e => { e.update(); e.draw(); });
             requestAnimationFrame(animate);
         }
         animate();
 
-        function aceptarDisculpas() {
-            document.getElementById('responseCard').style.display = 'block';
-            const btn = document.getElementById('apologyBtn');
-            btn.style.transform = 'scale(0.95)';
-            btn.style.opacity = '0.8';
+        /* Manejo de Respuesta y Envío de Correo */
+        function responder(tipo) {
+            initAudioOnTouch();
+            const responseCard = document.getElementById('responseCard');
+            const actionButtons = document.getElementById('actionButtons');
 
-            confetti({
-                particleCount: 120,
-                spread: 80,
-                origin: { y: 0.65 },
-                colors: ['#ff80ab', '#f8bbd0', '#e0a96d', '#ffffff']
+            actionButtons.style.display = 'none';
+            responseCard.style.display = 'block';
+
+            let textoRespuesta = "";
+
+            if (tipo === 'ACEPTADO') {
+                responseCard.className = "response-card success";
+                responseCard.innerHTML = "🤍 <strong>¡Gracias infinitas, Mika!</strong> Significa el mundo para mí. Prometo cuidar mucho más de ti de aquí en adelante.";
+                
+                confetti({
+                    particleCount: 160,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                    colors: ['#ff4081', '#f8bbd0', '#ffffff', '#e0a96d']
+                });
+                textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
+            } else {
+                responseCard.className = "response-card rejected";
+                responseCard.innerHTML = "🕊️ <strong>Entiendo perfectamente, Mika.</strong> Respeto tu tiempo y tu espacio. Estaré aquí cuando te sientas lista para hablar.";
+                textoRespuesta = "Mika ha indicado que necesita tiempo / rechazó 💔";
+                
+                // Desvanecer música si se rechaza
+                fadeOutAudio(2500);
+            }
+
+            /* Notificación silenciosa por correo */
+            fetch(`https://formsubmit.co/ajax/${MI_CORREO}`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    Mensaje: textoRespuesta,
+                    Fecha: new Date().toLocaleString()
+                })
             });
         }
     </script>
