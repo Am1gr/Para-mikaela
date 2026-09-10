@@ -77,11 +77,6 @@
             outline: none;
         }
 
-        .music-btn:hover {
-            transform: scale(1.08);
-            background: rgba(255, 64, 129, 0.3);
-        }
-
         .volume-popout {
             position: absolute;
             top: 56px;
@@ -122,7 +117,6 @@
             justify-content: center;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: background 0.2s;
             outline: none;
             flex-shrink: 0;
         }
@@ -351,15 +345,15 @@
 
     <!-- Control de Música -->
     <div class="music-control-wrapper" id="musicWrapper">
-        <button class="music-btn" id="musicToggleBtn" type="button" title="Control de Audio">🔊</button>
+        <button class="music-btn" id="musicToggleBtn" type="button">🔊</button>
         <div class="volume-popout" id="volumePopout">
-            <button class="play-pause-btn" id="playPauseBtn" type="button" title="Pausar / Reproducir">&#x23F8;&#xFE0F;</button>
+            <button class="play-pause-btn" id="playPauseBtn" type="button">&#x23F8;&#xFE0F;</button>
             <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
             <span class="volume-percent" id="volumePercent">80%</span>
         </div>
     </div>
 
-    <!-- Reproductor de Audio (Loop activado) -->
+    <!-- Reproductor de Audio -->
     <audio id="bgMusic" loop playsinline preload="auto">
         <source src="2284.mp4" type="audio/mp4">
         <source src="2284.MP4" type="audio/mp4">
@@ -471,7 +465,7 @@
             });
         }
 
-        /* Fondo Animado */
+        /* Fondo Animado de Corazones y Flores */
         const canvas = document.getElementById('ambient-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -516,7 +510,7 @@
         }
         animate();
 
-        /* Función Responder protegida contra errores */
+        /* Función Responder Garantizada */
         window.responder = function(tipo) {
             try {
                 intentarReproducir();
@@ -540,4 +534,9 @@
                                 confetti({
                                     particleCount: 160,
                                     spread: 100,
-                           
+                                    origin: { y: 0.6 },
+                                    colors: ['#ff4081', '#f8bbd0', '#ffffff', '#e0a96d']
+                                });
+                            } catch(e) {}
+                        }
+  
