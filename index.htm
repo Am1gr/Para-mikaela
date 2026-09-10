@@ -38,7 +38,6 @@
             overflow-x: hidden;
         }
 
-        /* Canvas de corazones adaptables a cualquier resolución */
         #ambient-canvas {
             position: fixed;
             top: 0;
@@ -47,6 +46,34 @@
             height: 100vh;
             z-index: 1;
             pointer-events: none;
+        }
+
+        /* Botón Flotante para control de música */
+        .music-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 64, 129, 0.3);
         }
 
         .wrapper {
@@ -60,7 +87,6 @@
             padding: clamp(1rem, 5vw, 3rem);
         }
 
-        /* Tarjeta Responsiva (Ajuste automático para Celular y PC) */
         .card {
             position: relative;
             width: min(100%, 600px);
@@ -168,7 +194,6 @@
             border-bottom: 1px dotted #ff80ab;
         }
 
-        /* Botones de acción (Adaptados a táctil y ratón de PC) */
         .actions {
             display: flex;
             flex-direction: column;
@@ -197,7 +222,6 @@
             outline: none;
         }
 
-        /* Interacción optimizada para PC */
         @media (hover: hover) {
             .btn-apology:hover {
                 transform: translateY(-3px) scale(1.02);
@@ -262,7 +286,6 @@
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Pantallas muy pequeñas o teléfonos compactos */
         @media (max-width: 420px) {
             .wrapper { padding: 0.8rem; }
             .card { padding: 1.5rem 1.1rem; border-radius: 22px; }
@@ -272,7 +295,12 @@
 </head>
 <body>
 
-    <audio id="bgMusic" loop src="2284.mp4"></audio>
+    <button class="music-btn" id="musicToggleBtn" title="Reproducir / Pausar Música">🎵</button>
+
+    <video id="bgMusic" loop playsinline webkit-playsinline preload="auto" style="position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
+        <source src="2284.mp4" type="video/mp4">
+        <source src="2284.MP4" type="video/mp4">
+    </video>
 
     <canvas id="ambient-canvas"></canvas>
 
@@ -281,18 +309,18 @@
             
             <div class="floating-heart-icon">💖</div>
 
-            <div class="header-badge">Mensaje para ti</div>
+            <div class="header-badge">Para ti</div>
 
-            <h1>Mika, perdón de corazón</h1>
-            <p class="sub-title">Para ti, porque te mereces toda mi sinceridad...</p>
+            <h1>Mika, necesitaba decirte esto...</h1>
+            <p class="sub-title">Me equivoqué y quería hablarte con total sinceridad.</p>
 
             <div class="divider"></div>
 
             <div class="message-body">
                 <p>Hola <span class="highlight">Mika</span>,</p>
-                <p>Escribo esto porque no quería dejar pasar un momento más sin decirte sinceramente cuánto <span class="highlight">lamento haberte hecho daño</span>. Saber que mis acciones o palabras te causaron pesar me duele profundamente.</p>
-                <p>Jamás fue mi intención lastimarte. Tu tranquilidad y tus sentimientos me importan muchísimo, y me duele haber fallado en cuidarlos como debía.</p>
-                <p>Valoro infinitamente quién eres y lo que significas para mí. Prometo dar lo mejor de mí para remediarlo.</p>
+                <p>No quería dejar pasar más tiempo sin hablarte claro y desde el corazón. Me di cuenta de lo mucho que te afectaron las cosas y de que <span class="highlight">te hice daño al no saber darte el tiempo y el espacio que necesitabas</span>.</p>
+                <p>A veces la desesperación por querer arreglar todo me hizo actuar sin pensar, apurándote y sin saber escuchar lo que tú sentías en ese momento. Sé que esa presión te lastimó y fue un error de mi parte no respetar tus tiempos.</p>
+                <p>No busco excusarme ni justificarme. Solo quería pedirte perdón sinceramente, decirte que entiendo tu postura y que valoro muchísimo quién eres para mí.</p>
             </div>
 
             <div class="actions" id="actionButtons">
@@ -300,70 +328,95 @@
                     <span>Acepto tus disculpas 💖</span>
                 </button>
                 <button class="btn-reject" id="rejectBtn" onclick="responder('RECHAZADO')">
-                    Aún necesito tiempo / No acepto 💔
+                    Todavía necesito mi tiempo 💔
                 </button>
             </div>
 
             <div id="responseCard" class="response-card"></div>
 
-            <div class="footer-note">Hecho especialmente para Mika 🌸</div>
+            <div class="footer-note">Pensado especialmente para Mika 🌸</div>
         </div>
     </div>
 
     <script>
-        /* Correo para recibir las notificaciones */
         const MI_CORREO = "axl02877@gmail.com"; 
 
-        /* Sistema de Audio con Fade-In (Aparición) y Fade-Out (Desvanecimiento) */
         const bgMusic = document.getElementById('bgMusic');
+        const musicToggleBtn = document.getElementById('musicToggleBtn');
         let musicStarted = false;
         let fadeInterval = null;
 
-        // Aparición Suave (Fade-In)
-        function fadeInAudio(duration = 3500, maxVolume = 0.6) {
+        function fadeInAudio(duration = 3000, maxVolume = 0.7) {
             if (fadeInterval) clearInterval(fadeInterval);
-            bgMusic.volume = 0;
+            
             bgMusic.play().then(() => {
                 musicStarted = true;
-                const step = maxVolume / (duration / 50);
+                musicToggleBtn.textContent = "🔊";
+
+                try {
+                    bgMusic.volume = 0;
+                    const step = maxVolume / (duration / 50);
+                    fadeInterval = setInterval(() => {
+                        if (bgMusic.volume + step < maxVolume) {
+                            bgMusic.volume += step;
+                        } else {
+                            bgMusic.volume = maxVolume;
+                            clearInterval(fadeInterval);
+                        }
+                    }, 50);
+                } catch(e) {
+                    bgMusic.volume = 1;
+                }
+            }).catch(err => {
+                console.log("Autoplay bloqueado:", err);
+                musicToggleBtn.textContent = "🎵";
+            });
+        }
+
+        function fadeOutAudio(duration = 2000) {
+            if (fadeInterval) clearInterval(fadeInterval);
+            try {
+                const step = bgMusic.volume / (duration / 50);
                 fadeInterval = setInterval(() => {
-                    if (bgMusic.volume + step < maxVolume) {
-                        bgMusic.volume += step;
+                    if (bgMusic.volume - step > 0) {
+                        bgMusic.volume -= step;
                     } else {
-                        bgMusic.volume = maxVolume;
+                        bgMusic.volume = 0;
+                        bgMusic.pause();
+                        musicToggleBtn.textContent = "🔇";
                         clearInterval(fadeInterval);
                     }
                 }, 50);
-            }).catch(() => {});
-        }
-
-        // Desvanecimiento Suave (Fade-Out)
-        function fadeOutAudio(duration = 2500, callback) {
-            if (fadeInterval) clearInterval(fadeInterval);
-            const step = bgMusic.volume / (duration / 50);
-            fadeInterval = setInterval(() => {
-                if (bgMusic.volume - step > 0) {
-                    bgMusic.volume -= step;
-                } else {
-                    bgMusic.volume = 0;
-                    bgMusic.pause();
-                    clearInterval(fadeInterval);
-                    if (callback) callback();
-                }
-            }, 50);
-        }
-
-        // Iniciar audio al interactuar por primera vez con la pantalla
-        function initAudioOnTouch() {
-            if (!musicStarted) {
-                fadeInAudio(3500, 0.6);
+            } catch(e) {
+                bgMusic.pause();
+                musicToggleBtn.textContent = "🔇";
             }
         }
 
-        document.body.addEventListener('click', initAudioOnTouch, { once: true });
-        document.body.addEventListener('touchstart', initAudioOnTouch, { once: true });
+        function toggleMusic() {
+            if (bgMusic.paused) {
+                fadeInAudio(2000);
+            } else {
+                fadeOutAudio(1500);
+            }
+        }
 
-        /* Fondo animado responsivo de Corazones y Flores */
+        musicToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMusic();
+        });
+
+        function startOnUserInteraction() {
+            if (!musicStarted) {
+                fadeInAudio(3000);
+            }
+        }
+
+        ['click', 'touchstart', 'touchend'].forEach(evt => {
+            document.addEventListener(evt, startOnUserInteraction, { once: true });
+        });
+
+        /* Fondo animado */
         const canvas = document.getElementById('ambient-canvas');
         const ctx = canvas.getContext('2d');
         let width = canvas.width = window.innerWidth;
@@ -408,9 +461,9 @@
         }
         animate();
 
-        /* Manejo de Respuesta y Envío de Correo */
+        /* Manejo de Respuesta */
         function responder(tipo) {
-            initAudioOnTouch();
+            startOnUserInteraction();
             const responseCard = document.getElementById('responseCard');
             const actionButtons = document.getElementById('actionButtons');
 
@@ -421,7 +474,7 @@
 
             if (tipo === 'ACEPTADO') {
                 responseCard.className = "response-card success";
-                responseCard.innerHTML = "🤍 <strong>¡Gracias infinitas, Mika!</strong> Significa el mundo para mí. Prometo cuidar mucho más de ti de aquí en adelante.";
+                responseCard.innerHTML = "🤍 <strong>Gracias de todo corazón, Mika.</strong> Significa muchísimo para mí. Prometo ir a tu ritmo y ser mucho más cuidadoso de aquí en adelante.";
                 
                 confetti({
                     particleCount: 160,
@@ -432,14 +485,12 @@
                 textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
             } else {
                 responseCard.className = "response-card rejected";
-                responseCard.innerHTML = "🕊️ <strong>Entiendo perfectamente, Mika.</strong> Respeto tu tiempo y tu espacio. Estaré aquí cuando te sientas lista para hablar.";
-                textoRespuesta = "Mika ha indicado que necesita tiempo / rechazó 💔";
+                responseCard.innerHTML = "🕊️ <strong>Lo entiendo perfectamente, Mika.</strong> Tómate todo el tiempo y espacio que necesites, sin ninguna presión. Aquí estaré si algún día quieres hablar.";
+                textoRespuesta = "Mika ha indicado que necesita más tiempo / espacio 💔";
                 
-                // Desvanecer música si se rechaza
-                fadeOutAudio(2500);
+                fadeOutAudio(2000);
             }
 
-            /* Notificación silenciosa por correo */
             fetch(`https://formsubmit.co/ajax/${MI_CORREO}`, {
                 method: "POST",
                 headers: { 
