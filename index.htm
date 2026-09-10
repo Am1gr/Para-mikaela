@@ -48,32 +48,130 @@
             pointer-events: none;
         }
 
-        /* Botón Flotante para control de música */
-        .music-btn {
+        /* Control de Música y Barra de Volumen Desplegable */
+        .music-control-wrapper {
             position: fixed;
             top: 20px;
             right: 20px;
-            z-index: 10;
+            z-index: 100;
+        }
+
+        .music-btn {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
-            width: 46px;
-            height: 46px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             transition: all 0.3s ease;
+            outline: none;
         }
 
         .music-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
             background: rgba(255, 64, 129, 0.3);
+        }
+
+        .volume-popout {
+            position: absolute;
+            top: 56px;
+            right: 0;
+            background: rgba(25, 8, 22, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            border-radius: 20px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .volume-popout.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .play-pause-btn {
+            background: rgba(255, 64, 129, 0.25);
+            border: 1px solid rgba(255, 64, 129, 0.5);
+            color: #fff;
+            border-radius: 50%;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .play-pause-btn:hover {
+            background: rgba(255, 64, 129, 0.5);
+        }
+
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ff4081;
+            box-shadow: 0 0 8px rgba(255, 64, 129, 0.8);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #ff4081;
+            border: none;
+            box-shadow: 0 0 8px rgba(255, 64, 129, 0.8);
+            cursor: pointer;
+        }
+
+        .volume-percent {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            min-width: 34px;
+            text-align: right;
         }
 
         .wrapper {
@@ -295,7 +393,14 @@
 </head>
 <body>
 
-    <button class="music-btn" id="musicToggleBtn" title="Reproducir / Pausar Música">🎵</button>
+    <div class="music-control-wrapper" id="musicWrapper">
+        <button class="music-btn" id="musicToggleBtn" title="Control de Volumen">🔊</button>
+        <div class="volume-popout" id="volumePopout">
+            <button class="play-pause-btn" id="playPauseBtn" title="Pausar / Reproducir">⏸️</button>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.7">
+            <span class="volume-percent" id="volumePercent">70%</span>
+        </div>
+    </div>
 
     <video id="bgMusic" loop playsinline webkit-playsinline preload="auto" style="position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
         <source src="2284.mp4" type="video/mp4">
@@ -312,15 +417,16 @@
             <div class="header-badge">Para ti</div>
 
             <h1>Mika, necesitaba decirte esto...</h1>
-            <p class="sub-title">Me equivoqué y quería hablarte con total sinceridad.</p>
+            <p class="sub-title">Sin palabras vacías ni excusas. Desde el corazón.</p>
 
             <div class="divider"></div>
 
             <div class="message-body">
                 <p>Hola <span class="highlight">Mika</span>,</p>
-                <p>No quería dejar pasar más tiempo sin hablarte claro y desde el corazón. Me di cuenta de lo mucho que te afectaron las cosas y de que <span class="highlight">te hice daño al no saber darte el tiempo y el espacio que necesitabas</span>.</p>
-                <p>A veces la desesperación por querer arreglar todo me hizo actuar sin pensar, apurándote y sin saber escuchar lo que tú sentías en ese momento. Sé que esa presión te lastimó y fue un error de mi parte no respetar tus tiempos.</p>
-                <p>No busco excusarme ni justificarme. Solo quería pedirte perdón sinceramente, decirte que entiendo tu postura y que valoro muchísimo quién eres para mí.</p>
+                <p>He estado pensando mucho en todo lo que pasó entre nosotros y me pesa profundamente saber que te dañé. Sé que <span class="highlight">no estuve presente cuando me necesitabas y que no supe darte el tiempo ni el lugar que merecías</span>.</p>
+                <p>Lo que más me duele es reconocer que <span class="highlight">cometí el error de no respetar tus decisiones ni tus tiempos</span>. En lugar de escucharte de verdad, me dejé llevar por mi propia prisa y mi ansiedad, presionándote en momentos en los que solo necesitabas comprensión y calma de mi parte.</p>
+                <p>No estamos juntos ahora y entiendo perfectamente por qué. No busco exigirte nada ni dar por sentado que las cosas deban ser como antes. Solo quería pedirte perdón sinceramente y decirte que te quiero mucho. Lo que siento por ti es real y precisamente por eso aprendí que quererte también significa aprender a escucharte, respetar tus límites y saber dar espacio.</p>
+                <p>Si algún día me das la oportunidad de volver a acercarme, me encantaría demostrarte con hechos que puedo hacer las cosas bien y ser el apoyo que te mereces. Y si no es así, también lo respetaré con todo mi corazón.</p>
             </div>
 
             <div class="actions" id="actionButtons">
@@ -343,166 +449,116 @@
 
         const bgMusic = document.getElementById('bgMusic');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
-        let musicStarted = false;
+        const volumePopout = document.getElementById('volumePopout');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumePercent = document.getElementById('volumePercent');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+
+        let audioInitialized = false;
         let fadeInterval = null;
 
-        function fadeInAudio(duration = 3000, maxVolume = 0.7) {
+        // Función de Entrada Suave (Fade In)
+        function fadeInAudio(targetVolume = parseFloat(volumeSlider.value), duration = 2500) {
             if (fadeInterval) clearInterval(fadeInterval);
-            
+            bgMusic.volume = 0;
             bgMusic.play().then(() => {
-                musicStarted = true;
-                musicToggleBtn.textContent = "🔊";
+                playPauseBtn.textContent = "⏸️";
+                let currentStep = 0;
+                const steps = 40;
+                const intervalTime = duration / steps;
+                const volumeStep = targetVolume / steps;
 
-                try {
-                    bgMusic.volume = 0;
-                    const step = maxVolume / (duration / 50);
-                    fadeInterval = setInterval(() => {
-                        if (bgMusic.volume + step < maxVolume) {
-                            bgMusic.volume += step;
-                        } else {
-                            bgMusic.volume = maxVolume;
-                            clearInterval(fadeInterval);
-                        }
-                    }, 50);
-                } catch(e) {
-                    bgMusic.volume = 1;
-                }
+                fadeInterval = setInterval(() => {
+                    currentStep++;
+                    let nextVol = volumeStep * currentStep;
+                    if (nextVol >= targetVolume) {
+                        bgMusic.volume = targetVolume;
+                        clearInterval(fadeInterval);
+                        fadeInterval = null;
+                    } else {
+                        bgMusic.volume = nextVol;
+                    }
+                    actualizarIconoBoton();
+                }, intervalTime);
             }).catch(err => {
-                console.log("Autoplay bloqueado:", err);
-                musicToggleBtn.textContent = "🎵";
+                console.log("Autoplay esperando interacción:", err);
             });
         }
 
-        function fadeOutAudio(duration = 2000) {
+        // Función de Desaparición Suave (Fade Out)
+        function fadeOutAudio(duration = 2000, onComplete = null) {
             if (fadeInterval) clearInterval(fadeInterval);
-            try {
-                const step = bgMusic.volume / (duration / 50);
-                fadeInterval = setInterval(() => {
-                    if (bgMusic.volume - step > 0) {
-                        bgMusic.volume -= step;
-                    } else {
-                        bgMusic.volume = 0;
-                        bgMusic.pause();
-                        musicToggleBtn.textContent = "🔇";
-                        clearInterval(fadeInterval);
-                    }
-                }, 50);
-            } catch(e) {
+            const startVol = bgMusic.volume;
+            if (startVol <= 0 || bgMusic.paused) {
                 bgMusic.pause();
+                playPauseBtn.textContent = "▶️";
                 musicToggleBtn.textContent = "🔇";
+                if (onComplete) onComplete();
+                return;
             }
+
+            let currentStep = 0;
+            const steps = 40;
+            const intervalTime = duration / steps;
+
+            fadeInterval = setInterval(() => {
+                currentStep++;
+                let nextVol = startVol - (startVol * (currentStep / steps));
+                if (nextVol <= 0) {
+                    bgMusic.volume = 0;
+                    bgMusic.pause();
+                    playPauseBtn.textContent = "▶️";
+                    musicToggleBtn.textContent = "🔇";
+                    clearInterval(fadeInterval);
+                    fadeInterval = null;
+                    if (onComplete) onComplete();
+                } else {
+                    bgMusic.volume = nextVol;
+                    actualizarIconoBoton();
+                }
+            }, intervalTime);
         }
 
-        function toggleMusic() {
+        // Abrir/Cerrar menú flotante
+        musicToggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            volumePopout.classList.toggle('show');
+        });
+
+        // Cerrar si hace clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#musicWrapper')) {
+                volumePopout.classList.remove('show');
+            }
+        });
+
+        // Control manual por Slider (cancela cualquier Fade activo)
+        volumeSlider.addEventListener('input', (e) => {
+            if (fadeInterval) clearInterval(fadeInterval);
+            const val = parseFloat(e.target.value);
+            bgMusic.volume = val;
+            const percentage = Math.round(val * 100);
+            volumePercent.textContent = `${percentage}%`;
+            actualizarIconoBoton();
+        });
+
+        // Botón Play/Pausa con Fade In / Fade Out
+        playPauseBtn.addEventListener('click', () => {
             if (bgMusic.paused) {
-                fadeInAudio(2000);
+                fadeInAudio(parseFloat(volumeSlider.value), 1800);
             } else {
                 fadeOutAudio(1500);
             }
-        }
-
-        musicToggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMusic();
         });
 
-        function startOnUserInteraction() {
-            if (!musicStarted) {
-                fadeInAudio(3000);
-            }
-        }
-
-        ['click', 'touchstart', 'touchend'].forEach(evt => {
-            document.addEventListener(evt, startOnUserInteraction, { once: true });
-        });
-
-        /* Fondo animado */
-        const canvas = document.getElementById('ambient-canvas');
-        const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth;
-        let height = canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        });
-
-        class Element {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * width;
-                this.y = -20;
-                this.size = Math.random() * 12 + 8;
-                this.speedY = Math.random() * 1.2 + 0.5;
-                this.speedX = Math.random() * 0.8 - 0.4;
-                this.opacity = Math.random() * 0.6 + 0.3;
-                this.type = Math.random() > 0.4 ? '❤️' : '🌸';
-            }
-            update() {
-                this.y += this.speedY;
-                this.x += Math.sin(this.y * 0.01) + this.speedX;
-                if (this.y > height + 20) this.reset();
-            }
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.opacity;
-                ctx.font = `${this.size}px serif`;
-                ctx.fillText(this.type, this.x, this.y);
-                ctx.restore();
-            }
-        }
-
-        const elements = Array.from({ length: 30 }, () => new Element());
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            elements.forEach(e => { e.update(); e.draw(); });
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        /* Manejo de Respuesta */
-        function responder(tipo) {
-            startOnUserInteraction();
-            const responseCard = document.getElementById('responseCard');
-            const actionButtons = document.getElementById('actionButtons');
-
-            actionButtons.style.display = 'none';
-            responseCard.style.display = 'block';
-
-            let textoRespuesta = "";
-
-            if (tipo === 'ACEPTADO') {
-                responseCard.className = "response-card success";
-                responseCard.innerHTML = "🤍 <strong>Gracias de todo corazón, Mika.</strong> Significa muchísimo para mí. Prometo ir a tu ritmo y ser mucho más cuidadoso de aquí en adelante.";
-                
-                confetti({
-                    particleCount: 160,
-                    spread: 100,
-                    origin: { y: 0.6 },
-                    colors: ['#ff4081', '#f8bbd0', '#ffffff', '#e0a96d']
-                });
-                textoRespuesta = "Mika HA ACEPTADO tus disculpas 💖";
+        function actualizarIconoBoton() {
+            if (bgMusic.volume === 0 || bgMusic.paused) {
+                musicToggleBtn.textContent = "🔇";
+            } else if (bgMusic.volume < 0.5) {
+                musicToggleBtn.textContent = "🔉";
             } else {
-                responseCard.className = "response-card rejected";
-                responseCard.innerHTML = "🕊️ <strong>Lo entiendo perfectamente, Mika.</strong> Tómate todo el tiempo y espacio que necesites, sin ninguna presión. Aquí estaré si algún día quieres hablar.";
-                textoRespuesta = "Mika ha indicado que necesita más tiempo / espacio 💔";
-                
-                fadeOutAudio(2000);
+                musicToggleBtn.textContent = "🔊";
             }
-
-            fetch(`https://formsubmit.co/ajax/${MI_CORREO}`, {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    Mensaje: textoRespuesta,
-                    Fecha: new Date().toLocaleString()
-                })
-            });
         }
-    </script>
-</body>
-</html>
+
+        // Iniciar repro
