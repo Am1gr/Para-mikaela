@@ -38,6 +38,49 @@
             overflow-x: hidden;
         }
 
+        /* Pantalla de inicio para permitir Audio en Celulares */
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1a0826;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .start-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #ff4081 0%, #c2185b 100%);
+            color: #fff;
+            border: none;
+            padding: 16px 36px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(255, 64, 129, 0.5);
+            animation: pulseBtn 2s infinite;
+            margin-top: 20px;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
         #ambient-canvas {
             position: fixed;
             top: 0;
@@ -48,7 +91,7 @@
             pointer-events: none;
         }
 
-        /* Control de Música y Barra de Volumen Desplegable */
+        /* Control de Música y Barra de Volumen */
         .music-control-wrapper {
             position: fixed;
             top: 20px;
@@ -84,7 +127,7 @@
             position: absolute;
             top: 56px;
             right: 0;
-            background: rgba(25, 8, 22, 0.92);
+            background: rgba(25, 8, 22, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 182, 193, 0.3);
@@ -125,10 +168,6 @@
             flex-shrink: 0;
         }
 
-        .play-pause-btn:hover {
-            background: rgba(255, 64, 129, 0.5);
-        }
-
         .volume-slider {
             -webkit-appearance: none;
             appearance: none;
@@ -147,21 +186,6 @@
             height: 16px;
             border-radius: 50%;
             background: #ff4081;
-            box-shadow: 0 0 8px rgba(255, 64, 129, 0.8);
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-
-        .volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-        }
-
-        .volume-slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #ff4081;
-            border: none;
             box-shadow: 0 0 8px rgba(255, 64, 129, 0.8);
             cursor: pointer;
         }
@@ -187,7 +211,7 @@
 
         .card {
             position: relative;
-            width: min(100%, 600px);
+            width: min(100%, 620px);
             background: var(--card-bg);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
@@ -199,17 +223,6 @@
             overflow: hidden;
             text-align: center;
             margin: auto;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 50% 20%, rgba(255, 64, 129, 0.22) 0%, transparent 60%);
-            pointer-events: none;
         }
 
         @keyframes cardAppear {
@@ -273,17 +286,17 @@
         .message-body {
             color: var(--text-muted);
             font-size: clamp(0.95rem, 2.2vw, 1.1rem);
-            line-height: 1.8;
+            line-height: 1.85;
             font-weight: 300;
             text-align: left;
             margin-bottom: 2.2rem;
             background: rgba(0, 0, 0, 0.25);
-            padding: clamp(1rem, 3.5vw, 1.6rem);
+            padding: clamp(1.1rem, 3.8vw, 1.8rem);
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .message-body p { margin-bottom: 1rem; }
+        .message-body p { margin-bottom: 1.1rem; }
         .message-body p:last-child { margin-bottom: 0; }
 
         .highlight {
@@ -318,22 +331,6 @@
             align-items: center;
             gap: 10px;
             outline: none;
-        }
-
-        @media (hover: hover) {
-            .btn-apology:hover {
-                transform: translateY(-3px) scale(1.02);
-                box-shadow: 0 15px 35px rgba(255, 64, 129, 0.65);
-            }
-            .btn-reject:hover {
-                background: rgba(255, 255, 255, 0.15);
-                color: #ffffff;
-                border-color: rgba(255, 255, 255, 0.3);
-            }
-        }
-
-        .btn-apology:active, .btn-reject:active {
-            transform: scale(0.98);
         }
 
         .btn-reject {
@@ -393,19 +390,26 @@
 </head>
 <body>
 
+    <div class="start-overlay" id="startOverlay">
+        <div class="floating-heart-icon">💌</div>
+        <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 10px;">Para Mika</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 300px;">He preparado esto para ti. Toca el botón para abrir con música.</p>
+        <button class="start-btn" id="startBtn">Toca para abrir 💖</button>
+    </div>
+
     <div class="music-control-wrapper" id="musicWrapper">
-        <button class="music-btn" id="musicToggleBtn" title="Control de Volumen">🔊</button>
+        <button class="music-btn" id="musicToggleBtn" title="Control de Audio">🔊</button>
         <div class="volume-popout" id="volumePopout">
             <button class="play-pause-btn" id="playPauseBtn" title="Pausar / Reproducir">⏸️</button>
-            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.7">
-            <span class="volume-percent" id="volumePercent">70%</span>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.8">
+            <span class="volume-percent" id="volumePercent">80%</span>
         </div>
     </div>
 
-    <video id="bgMusic" loop playsinline webkit-playsinline preload="auto" style="position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none;">
-        <source src="2284.mp4" type="video/mp4">
-        <source src="2284.MP4" type="video/mp4">
-    </video>
+    <audio id="bgMusic" loop playsinline preload="auto">
+        <source src="2284.mp4" type="audio/mp4">
+        <source src="2284.MP4" type="audio/mp4">
+    </audio>
 
     <canvas id="ambient-canvas"></canvas>
 
@@ -416,17 +420,17 @@
 
             <div class="header-badge">Para ti</div>
 
-            <h1>Mika, necesitaba decirte esto...</h1>
-            <p class="sub-title">Sin palabras vacías ni excusas. Desde el corazón.</p>
+            <h1>Mika, de todo corazón...</h1>
+            <p class="sub-title">Sinceramente, sin excusas y pensando en ti.</p>
 
             <div class="divider"></div>
 
             <div class="message-body">
                 <p>Hola <span class="highlight">Mika</span>,</p>
-                <p>He estado pensando mucho en todo lo que pasó entre nosotros y me pesa profundamente saber que te dañé. Sé que <span class="highlight">no estuve presente cuando me necesitabas y que no supe darte el tiempo ni el lugar que merecías</span>.</p>
-                <p>Lo que más me duele es reconocer que <span class="highlight">cometí el error de no respetar tus decisiones ni tus tiempos</span>. En lugar de escucharte de verdad, me dejé llevar por mi propia prisa y mi ansiedad, presionándote en momentos en los que solo necesitabas comprensión y calma de mi parte.</p>
-                <p>No estamos juntos ahora y entiendo perfectamente por qué. No busco exigirte nada ni dar por sentado que las cosas deban ser como antes. Solo quería pedirte perdón sinceramente y decirte que te quiero mucho. Lo que siento por ti es real y precisamente por eso aprendí que quererte también significa aprender a escucharte, respetar tus límites y saber dar espacio.</p>
-                <p>Si algún día me das la oportunidad de volver a acercarme, me encantaría demostrarte con hechos que puedo hacer las cosas bien y ser el apoyo que te mereces. Y si no es así, también lo respetaré con todo mi corazón.</p>
+                <p>He estado pensando mucho en todo lo que pasó entre nosotros y me pesaba profundamente la necesidad de hablarte con total honestidad. Reconozco perfectamente que me equivoqué contigo.</p>
+                <p><span class="highlight">No te di el tiempo ni la atención que me pedías y que tanto te merecías.</span> Sé que querías sentirte escuchada, cuidada y presente en mi vida, y en lugar de darle valor a eso, me distancié y descuidé lo que teníamos. Y para colmo, cuando tratamos el tema, <span class="highlight">cometí el error de no respetar tus decisiones ni tus tiempos</span>, dejándome llevar por mi propia prisa en lugar de comprender lo que tú sentías.</p>
+                <p>No estamos juntos ahora y entiendo muy bien por qué. No vengo a exigirte nada ni a pretender que las cosas sean como antes de la noche a la mañana. Solo quiero pedirte perdón de corazón. Te quiero muchísimo, y precisamente porque te quiero aprendí que quererte bien significa darte tu lugar, ofrecerte la atención que te mereces y respetar siempre tus decisiones.</p>
+                <p>Si en algún momento me das la oportunidad de demostrártelo, me encantaría estar presente para ti de la manera en que debí haberlo hecho desde el principio. Y si prefieres mantener tu espacio, también lo respetaré con todo mi cariño.</p>
             </div>
 
             <div class="actions" id="actionButtons">
@@ -448,47 +452,63 @@
         const MI_CORREO = "axl02877@gmail.com"; 
 
         const bgMusic = document.getElementById('bgMusic');
+        const startOverlay = document.getElementById('startOverlay');
+        const startBtn = document.getElementById('startBtn');
         const musicToggleBtn = document.getElementById('musicToggleBtn');
         const volumePopout = document.getElementById('volumePopout');
         const volumeSlider = document.getElementById('volumeSlider');
         const volumePercent = document.getElementById('volumePercent');
         const playPauseBtn = document.getElementById('playPauseBtn');
 
-        let audioInitialized = false;
         let fadeInterval = null;
 
-        // Función de Entrada Suave (Fade In)
-        function fadeInAudio(targetVolume = parseFloat(volumeSlider.value), duration = 2500) {
-            if (fadeInterval) clearInterval(fadeInterval);
-            bgMusic.volume = 0;
-            bgMusic.play().then(() => {
-                playPauseBtn.textContent = "⏸️";
-                let currentStep = 0;
-                const steps = 40;
-                const intervalTime = duration / steps;
-                const volumeStep = targetVolume / steps;
-
-                fadeInterval = setInterval(() => {
-                    currentStep++;
-                    let nextVol = volumeStep * currentStep;
-                    if (nextVol >= targetVolume) {
-                        bgMusic.volume = targetVolume;
-                        clearInterval(fadeInterval);
-                        fadeInterval = null;
-                    } else {
-                        bgMusic.volume = nextVol;
-                    }
-                    actualizarIconoBoton();
-                }, intervalTime);
-            }).catch(err => {
-                console.log("Autoplay esperando interacción:", err);
-            });
+        // Función segura para ajustar volumen (Evita errores en iOS donde volume es solo lectura)
+        function setAudioVolume(val) {
+            try {
+                bgMusic.volume = Math.max(0, Math.min(1, val));
+            } catch (e) {
+                console.log("Ajuste de volumen no soportado en este dispositivo:", e);
+            }
         }
 
-        // Función de Desaparición Suave (Fade Out)
+        // Entrada Suave de Música (Fade In)
+        function fadeInAudio(targetVolume = parseFloat(volumeSlider.value), duration = 2500) {
+            if (fadeInterval) clearInterval(fadeInterval);
+            setAudioVolume(0);
+            
+            const playPromise = bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    playPauseBtn.textContent = "⏸️";
+                    let currentStep = 0;
+                    const steps = 30;
+                    const intervalTime = duration / steps;
+                    const volumeStep = targetVolume / steps;
+
+                    fadeInterval = setInterval(() => {
+                        currentStep++;
+                        let nextVol = volumeStep * currentStep;
+                        if (nextVol >= targetVolume) {
+                            setAudioVolume(targetVolume);
+                            clearInterval(fadeInterval);
+                            fadeInterval = null;
+                        } else {
+                            setAudioVolume(nextVol);
+                        }
+                        actualizarIconoBoton();
+                    }, intervalTime);
+                }).catch(err => {
+                    console.log("Error al reproducir audio:", err);
+                });
+            }
+        }
+
+        // Desaparición Suave de Música (Fade Out)
         function fadeOutAudio(duration = 2000, onComplete = null) {
             if (fadeInterval) clearInterval(fadeInterval);
-            const startVol = bgMusic.volume;
+            let startVol = 0.8;
+            try { startVol = bgMusic.volume; } catch(e) {}
+
             if (startVol <= 0 || bgMusic.paused) {
                 bgMusic.pause();
                 playPauseBtn.textContent = "▶️";
@@ -498,14 +518,14 @@
             }
 
             let currentStep = 0;
-            const steps = 40;
+            const steps = 30;
             const intervalTime = duration / steps;
 
             fadeInterval = setInterval(() => {
                 currentStep++;
                 let nextVol = startVol - (startVol * (currentStep / steps));
                 if (nextVol <= 0) {
-                    bgMusic.volume = 0;
+                    setAudioVolume(0);
                     bgMusic.pause();
                     playPauseBtn.textContent = "▶️";
                     musicToggleBtn.textContent = "🔇";
@@ -513,52 +533,23 @@
                     fadeInterval = null;
                     if (onComplete) onComplete();
                 } else {
-                    bgMusic.volume = nextVol;
+                    setAudioVolume(nextVol);
                     actualizarIconoBoton();
                 }
             }, intervalTime);
         }
 
-        // Abrir/Cerrar menú flotante
+        // Iniciar con el botón de la pantalla overlay
+        startBtn.addEventListener('click', () => {
+            startOverlay.classList.add('hidden');
+            fadeInAudio(parseFloat(volumeSlider.value), 2500);
+        });
+
+        // Toggle Menú Volumen
         musicToggleBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             volumePopout.classList.toggle('show');
         });
 
-        // Cerrar si hace clic fuera
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#musicWrapper')) {
-                volumePopout.classList.remove('show');
-            }
-        });
-
-        // Control manual por Slider (cancela cualquier Fade activo)
-        volumeSlider.addEventListener('input', (e) => {
-            if (fadeInterval) clearInterval(fadeInterval);
-            const val = parseFloat(e.target.value);
-            bgMusic.volume = val;
-            const percentage = Math.round(val * 100);
-            volumePercent.textContent = `${percentage}%`;
-            actualizarIconoBoton();
-        });
-
-        // Botón Play/Pausa con Fade In / Fade Out
-        playPauseBtn.addEventListener('click', () => {
-            if (bgMusic.paused) {
-                fadeInAudio(parseFloat(volumeSlider.value), 1800);
-            } else {
-                fadeOutAudio(1500);
-            }
-        });
-
-        function actualizarIconoBoton() {
-            if (bgMusic.volume === 0 || bgMusic.paused) {
-                musicToggleBtn.textContent = "🔇";
-            } else if (bgMusic.volume < 0.5) {
-                musicToggleBtn.textContent = "🔉";
-            } else {
-                musicToggleBtn.textContent = "🔊";
-            }
-        }
-
-        // Iniciar repro
+            if (!e.target.c
